@@ -1,8 +1,19 @@
-type Tab = browser.tabs.Tab;
-type BookmarkTreeNode = browser.bookmarks.BookmarkTreeNode;
+import Tab from '../domains/Tab';
+import Bookmark from '../domains/Bookmark';
+import History from '../domains/History';
 
-export default class CompletionsRepository {
-  async queryBookmarks(keywords: string): Promise<BookmarkTreeNode[]> {
+export default interface CompletionsRepository {
+  queryBookmarks(keywords: string): Promise<Bookmark[]>;
+
+  queryHistories(keywords: string): Promise<History[]>;
+
+  queryTabs(keywords: string, excludePinned: boolean): Promise<Tab[]>;
+
+  // eslint-disable-next-line semi
+}
+
+export class CompletionsRepositoryImpl implements CompletionsRepository {
+  async queryBookmarks(keywords: string): Promise<Bookmark[]> {
     let items = await browser.bookmarks.search({ query: keywords });
     return items.filter((item) => {
       if (!item.url) {
@@ -15,14 +26,17 @@ export default class CompletionsRepository {
         return false;
       }
       return item.type === 'bookmark' && url.protocol !== 'place:';
-    });
+    }).map(item => ({ url: item.url!!, ...item }));
   }
 
-  queryHistories(keywords: string): Promise<browser.history.HistoryItem[]> {
-    return browser.history.search({
+  async queryHistories(keywords: string): Promise<History[]> {
+    let items = await browser.history.search({
       text: keywords,
       startTime: 0,
     });
+    return items
+      .filter(item => item.url !== undefined)
+      .map(item => ({ url: item.url!!, ...item }));
   }
 
   async queryTabs(keywords: string, excludePinned: boolean): Promise<Tab[]> {
@@ -32,6 +46,6 @@ export default class CompletionsRepository {
         t.title && t.title.toLowerCase().includes(keywords.toLowerCase());
     }).filter((t) => {
       return !(excludePinned && t.pinned);
-    });
+    }).map(t => ({ ...t, id: t.id!! }));
   }
 }

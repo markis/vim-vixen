@@ -3,7 +3,15 @@ import GlobalMark from '../domains/GlobalMark';
 
 const MARK_KEY = 'mark';
 
-export default class MarkRepository {
+export default interface MarkRepository {
+  getMark(key: string): Promise<GlobalMark | undefined>;
+
+  setMark(key: string, mark: GlobalMark): Promise<any>;
+
+  // eslint-disable-next-line semi
+}
+
+export class MarkRepositoryImpl implements MarkRepository {
   private cache: MemoryStorage;
 
   constructor() {
@@ -28,7 +36,7 @@ export default class MarkRepository {
     return Promise.resolve();
   }
 
-  getOrEmptyMarks() {
+  private getOrEmptyMarks() {
     return this.cache.get(MARK_KEY) || {};
   }
 }

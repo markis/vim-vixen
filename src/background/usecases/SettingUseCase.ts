@@ -1,6 +1,8 @@
 // eslint-disable-next-line max-len
-import PersistentSettingRepository from '../repositories/PersistentSettingRepository';
-import SettingRepository from '../repositories/SettingRepository';
+import PersistentSettingRepository, { PersistentSettingRepositoryImpl }
+  from '../repositories/PersistentSettingRepository';
+import SettingRepository, { SettingRepositoryImpl }
+  from '../repositories/SettingRepository';
 import { DefaultSettingData } from '../../shared/SettingData';
 import Settings from '../../shared/Settings';
 
@@ -9,9 +11,12 @@ export default class SettingUseCase {
 
   private settingRepository: SettingRepository;
 
-  constructor() {
-    this.persistentSettingRepository = new PersistentSettingRepository();
-    this.settingRepository = new SettingRepository();
+  constructor({
+    persistentSettingRepository = new PersistentSettingRepositoryImpl(),
+    settingRepository = new SettingRepositoryImpl(),
+  } = {}) {
+    this.persistentSettingRepository = persistentSettingRepository;
+    this.settingRepository = settingRepository;
   }
 
   get(): Promise<Settings> {

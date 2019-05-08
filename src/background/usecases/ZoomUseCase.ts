@@ -8,32 +8,34 @@ const ZOOM_SETTINGS: number[] = [
 export default class ZoomUseCase {
   private tabPresenter: TabPresenter;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
+  constructor({
+    tabPresenter = new TabPresenter(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
   }
 
-  async zoomIn(): Promise<any> {
+  async zoomIn(): Promise<void> {
     let tab = await this.tabPresenter.getCurrent();
-    let tabId = tab.id as number;
+    let tabId = tab.id;
     let current = await this.tabPresenter.getZoom(tabId);
     let factor = ZOOM_SETTINGS.find(f => f > current);
     if (factor) {
-      return this.tabPresenter.setZoom(tabId as number, factor);
+      return this.tabPresenter.setZoom(tabId, factor);
     }
   }
 
   async zoomOut(): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    let tabId = tab.id as number;
+    let tabId = tab.id;
     let current = await this.tabPresenter.getZoom(tabId);
     let factor = ZOOM_SETTINGS.slice(0).reverse().find(f => f < current);
     if (factor) {
-      return this.tabPresenter.setZoom(tabId as number, factor);
+      return this.tabPresenter.setZoom(tabId, factor);
     }
   }
 
   async zoomNutoral(): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.tabPresenter.setZoom(tab.id as number, 1);
+    return this.tabPresenter.setZoom(tab.id, 1);
   }
 }

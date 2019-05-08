@@ -1,9 +1,12 @@
+import Tab from '../domains/Tab';
 import * as parsers from './parsers';
 import * as urls from '../../shared/urls';
 import TabPresenter from '../presenters/TabPresenter';
 import WindowPresenter from '../presenters/WindowPresenter';
-import SettingRepository from '../repositories/SettingRepository';
-import BookmarkRepository from '../repositories/BookmarkRepository';
+import SettingRepository, { SettingRepositoryImpl }
+  from '../repositories/SettingRepository';
+import BookmarkRepository, { BookmarkRepositoryImpl }
+  from '../repositories/BookmarkRepository';
 import ConsoleClient from '../infrastructures/ConsoleClient';
 import ContentMessageClient from '../infrastructures/ContentMessageClient';
 
@@ -20,22 +23,28 @@ export default class CommandIndicator {
 
   private contentMessageClient: ContentMessageClient;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
-    this.windowPresenter = new WindowPresenter();
-    this.settingRepository = new SettingRepository();
-    this.bookmarkRepository = new BookmarkRepository();
-    this.consoleClient = new ConsoleClient();
-
-    this.contentMessageClient = new ContentMessageClient();
+  constructor({
+    tabPresenter = new TabPresenter(),
+    windowPresenter = new WindowPresenter(),
+    settingRepository = new SettingRepositoryImpl(),
+    bookmarkRepository = new BookmarkRepositoryImpl(),
+    consoleClient = new ConsoleClient(),
+    contentMessageClient = new ContentMessageClient(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
+    this.windowPresenter = windowPresenter;
+    this.settingRepository = settingRepository;
+    this.bookmarkRepository = bookmarkRepository;
+    this.consoleClient = consoleClient;
+    this.contentMessageClient = contentMessageClient;
   }
 
-  async open(keywords: string): Promise<browser.tabs.Tab> {
+  async open(keywords: string): Promise<Tab> {
     let url = await this.urlOrSearch(keywords);
     return this.tabPresenter.open(url);
   }
 
-  async tabopen(keywords: string): Promise<browser.tabs.Tab> {
+  async tabopen(keywords: string): Promise<Tab> {
     let url = await this.urlOrSearch(keywords);
     return this.tabPresenter.create(url);
   }
@@ -57,7 +66,7 @@ export default class CommandIndicator {
       if (index < 0 || tabs.length <= index) {
         throw new RangeError(`tab ${index + 1} does not exist`);
       }
-      return this.tabPresenter.select(tabs[index].id as number);
+      return this.tabPresenter.select(tabs[index].id);
     } else if (keywords.trim() === '%') {
       // Select current window
       return;
@@ -77,10 +86,10 @@ export default class CommandIndicator {
     }
     for (let tab of tabs) {
       if (tab.index > current.index) {
-        return this.tabPresenter.select(tab.id as number);
+        return this.tabPresenter.select(tab.id);
       }
     }
-    return this.tabPresenter.select(tabs[0].id as number);
+    return this.tabPresenter.select(tabs[0].id);
   }
 
   async bdelete(force: boolean, keywords: string): Promise<any> {
@@ -91,24 +100,24 @@ export default class CommandIndicator {
     } else if (tabs.length > 1) {
       throw new Error('More than one match for ' + keywords);
     }
-    return this.tabPresenter.remove([tabs[0].id as number]);
+    return this.tabPresenter.remove([tabs[0].id]);
   }
 
   async bdeletes(force: boolean, keywords: string): Promise<any> {
     let excludePinned = !force;
     let tabs = await this.tabPresenter.getByKeyword(keywords, excludePinned);
-    let ids = tabs.map(tab => tab.id as number);
+    let ids = tabs.map(tab => tab.id);
     return this.tabPresenter.remove(ids);
   }
 
   async quit(): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.tabPresenter.remove([tab.id as number]);
+    return this.tabPresenter.remove([tab.id]);
   }
 
   async quitAll(): Promise<any> {
     let tabs = await this.tabPresenter.getAll();
-    let ids = tabs.map(tab => tab.id as number);
+    let ids = tabs.map(tab => tab.id);
     this.tabPresenter.remove(ids);
   }
 
@@ -116,7 +125,7 @@ export default class CommandIndicator {
     let tab = await this.tabPresenter.getCurrent();
     let item = await this.bookmarkRepository.create(title, tab.url as string);
     let message = 'Saved current page: ' + item.url;
-    return this.consoleClient.showInfo(tab.id as number, message);
+    return this.consoleClient.showInfo(tab.id, message);
   }
 
   async set(keywords: string): Promise<any> {

@@ -25,7 +25,7 @@ export default class OperationController {
   }
 
   // eslint-disable-next-line complexity, max-lines-per-function
-  exec(operation: operations.Operation): Promise<any> {
+  exec(operation: operations.Operation): Promise<void> {
     switch (operation.type) {
     case operations.TAB_CLOSE:
       return this.tabUseCase.close(false);

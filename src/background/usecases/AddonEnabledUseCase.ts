@@ -9,19 +9,22 @@ export default class AddonEnabledUseCase {
 
   private contentMessageClient: ContentMessageClient;
 
-  constructor() {
-    this.indicatorPresentor = new IndicatorPresenter();
-
+  constructor({
+    indicatorPresentor = new IndicatorPresenter(),
+    tabPresenter = new TabPresenter(),
+    contentMessageClient = new ContentMessageClient(),
+  } = {}) {
+    this.indicatorPresentor = indicatorPresentor;
     this.indicatorPresentor.onClick((tab) => {
       if (tab.id) {
         this.onIndicatorClick(tab.id);
       }
     });
 
-    this.tabPresenter = new TabPresenter();
+    this.tabPresenter = tabPresenter;
     this.tabPresenter.onSelected(info => this.onTabSelected(info.tabId));
 
-    this.contentMessageClient = new ContentMessageClient();
+    this.contentMessageClient = contentMessageClient;
   }
 
   indicate(enabled: boolean): Promise<void> {

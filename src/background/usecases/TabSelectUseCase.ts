@@ -3,8 +3,10 @@ import TabPresenter from '../presenters/TabPresenter';
 export default class TabSelectUseCase {
   private tabPresenter: TabPresenter;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
+  constructor({
+    tabPresenter = new TabPresenter(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
   }
 
   async selectPrev(count: number): Promise<any> {
@@ -17,7 +19,7 @@ export default class TabSelectUseCase {
       return;
     }
     let select = (tab.index - count + tabs.length) % tabs.length;
-    return this.tabPresenter.select(tabs[select].id as number);
+    return this.tabPresenter.select(tabs[select].id);
   }
 
   async selectNext(count: number): Promise<any> {
@@ -30,17 +32,17 @@ export default class TabSelectUseCase {
       return;
     }
     let select = (tab.index + count) % tabs.length;
-    return this.tabPresenter.select(tabs[select].id as number);
+    return this.tabPresenter.select(tabs[select].id);
   }
 
   async selectFirst(): Promise<any> {
     let tabs = await this.tabPresenter.getAll();
-    return this.tabPresenter.select(tabs[0].id as number);
+    return this.tabPresenter.select(tabs[0].id);
   }
 
   async selectLast(): Promise<any> {
     let tabs = await this.tabPresenter.getAll();
-    return this.tabPresenter.select(tabs[tabs.length - 1].id as number);
+    return this.tabPresenter.select(tabs[tabs.length - 1].id);
   }
 
   async selectPrevSelected(): Promise<any> {

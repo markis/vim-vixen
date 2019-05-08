@@ -1,5 +1,6 @@
 import TabPresenter from '../presenters/TabPresenter';
-import MarkRepository from '../repositories/MarkRepository';
+import MarkRepository, { MarkRepositoryImpl }
+  from '../repositories/MarkRepository';
 import ConsoleClient from '../infrastructures/ConsoleClient';
 import ContentMessageClient from '../infrastructures/ContentMessageClient';
 
@@ -12,16 +13,21 @@ export default class MarkUseCase {
 
   private contentMessageClient: ContentMessageClient;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
-    this.markRepository = new MarkRepository();
-    this.consoleClient = new ConsoleClient();
-    this.contentMessageClient = new ContentMessageClient();
+  constructor({
+    tabPresenter = new TabPresenter(),
+    markRepository = new MarkRepositoryImpl(),
+    consoleClient = new ConsoleClient(),
+    contentMessageClient = new ContentMessageClient(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
+    this.markRepository = markRepository;
+    this.consoleClient = consoleClient;
+    this.contentMessageClient = contentMessageClient;
   }
 
   async setGlobal(key: string, x: number, y: number): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    let mark = { tabId: tab.id as number, url: tab.url as string, x, y };
+    let mark = { tabId: tab.id, url: tab.url as string, x, y };
     return this.markRepository.setMark(key, mark);
   }
 
@@ -31,7 +37,7 @@ export default class MarkUseCase {
     let mark = await this.markRepository.getMark(key);
     if (!mark) {
       return this.consoleClient.showError(
-        current.id as number, 'Mark is not set');
+        current.id, 'Mark is not set');
     }
     try {
       await this.contentMessageClient.scrollTo(mark.tabId, mark.x, mark.y);
@@ -39,7 +45,7 @@ export default class MarkUseCase {
     } catch (e) {
       let tab = await this.tabPresenter.create(mark.url);
       return this.markRepository.setMark(key, {
-        tabId: tab.id as number, url: mark.url, x: mark.x, y: mark.y,
+        tabId: tab.id, url: mark.url, x: mark.x, y: mark.y,
       });
     }
   }

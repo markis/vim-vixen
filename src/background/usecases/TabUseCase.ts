@@ -1,14 +1,18 @@
 import TabPresenter from '../presenters/TabPresenter';
-import BrowserSettingRepository from '../repositories/BrowserSettingRepository';
+import BrowserSettingRepository, { BrowserSettingRepositoryImpl }
+  from '../repositories/BrowserSettingRepository';
 
 export default class TabUseCase {
   private tabPresenter: TabPresenter;
 
   private browserSettingRepository: BrowserSettingRepository;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
-    this.browserSettingRepository = new BrowserSettingRepository();
+  constructor({
+    tabPresenter = new TabPresenter(),
+    browserSettingRepository = new BrowserSettingRepositoryImpl(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
+    this.browserSettingRepository = browserSettingRepository;
   }
 
   async close(force: boolean): Promise<any> {
@@ -16,7 +20,7 @@ export default class TabUseCase {
     if (!force && tab.pinned) {
       return Promise.resolve();
     }
-    return this.tabPresenter.remove([tab.id as number]);
+    return this.tabPresenter.remove([tab.id]);
   }
 
   async closeRight(): Promise<any> {
@@ -29,7 +33,7 @@ export default class TabUseCase {
     for (let i = index + 1; i < tabs.length; ++i) {
       let tab = tabs[i];
       if (!tab.pinned) {
-        this.tabPresenter.remove([tab.id as number]);
+        this.tabPresenter.remove([tab.id]);
       }
     }
   }
@@ -40,22 +44,22 @@ export default class TabUseCase {
 
   async reload(cache: boolean): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.tabPresenter.reload(tab.id as number, cache);
+    return this.tabPresenter.reload(tab.id, cache);
   }
 
   async setPinned(pinned: boolean): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.tabPresenter.setPinned(tab.id as number, pinned);
+    return this.tabPresenter.setPinned(tab.id, pinned);
   }
 
   async togglePinned(): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.tabPresenter.setPinned(tab.id as number, !tab.pinned);
+    return this.tabPresenter.setPinned(tab.id, !tab.pinned);
   }
 
   async duplicate(): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.tabPresenter.duplicate(tab.id as number);
+    return this.tabPresenter.duplicate(tab.id);
   }
 
   async openPageSource(): Promise<any> {

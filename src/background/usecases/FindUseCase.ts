@@ -1,4 +1,5 @@
-import FindRepository from '../repositories/FindRepository';
+import FindRepository, { FindRepositoryImpl }
+  from '../repositories/FindRepository';
 import TabPresenter from '../presenters/TabPresenter';
 import ConsoleClient from '../infrastructures/ConsoleClient';
 
@@ -9,10 +10,14 @@ export default class FindUseCase {
 
   private consoleClient: ConsoleClient;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
-    this.findRepository = new FindRepository();
-    this.consoleClient = new ConsoleClient();
+  constructor({
+    tabPresenter = new TabPresenter(),
+    findRepository = new FindRepositoryImpl(),
+    consoleClient = new ConsoleClient(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
+    this.findRepository = findRepository;
+    this.consoleClient = consoleClient;
   }
 
   getKeyword(): Promise<string> {
@@ -25,6 +30,6 @@ export default class FindUseCase {
 
   async findStart(): Promise<any> {
     let tab = await this.tabPresenter.getCurrent();
-    return this.consoleClient.showFind(tab.id as number);
+    return this.consoleClient.showFind(tab.id);
   }
 }

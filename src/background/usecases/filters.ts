@@ -1,22 +1,22 @@
-type Item = browser.history.HistoryItem;
+import History from '../domains/History';
 
-const filterHttp = (items: Item[]): Item[] => {
+const filterHttp = (items: History[]): History[] => {
   let httpsHosts = items.map(x => new URL(x.url as string))
     .filter(x => x.protocol === 'https:')
     .map(x => x.host);
   let hostsSet = new Set(httpsHosts);
 
-  return items.filter((item: Item) => {
+  return items.filter((item: History) => {
     let url = new URL(item.url as string);
     return url.protocol === 'https:' || !hostsSet.has(url.host);
   });
 };
 
-const filterBlankTitle = (items: Item[]): Item[] => {
+const filterBlankTitle = (items: History[]): History[] => {
   return items.filter(item => item.title && item.title !== '');
 };
 
-const filterByTailingSlash = (items: Item[]): Item[] => {
+const filterByTailingSlash = (items: History[]): History[] => {
   let urls = items.map(item => new URL(item.url as string));
   let simplePaths = urls
     .filter(url => url.hash === '' && url.search === '')
@@ -33,8 +33,8 @@ const filterByTailingSlash = (items: Item[]): Item[] => {
   });
 };
 
-const filterByPathname = (items: Item[], min: number): Item[] => {
-  let hash: {[key: string]: Item} = {};
+const filterByPathname = (items: History[], min: number): History[] => {
+  let hash: {[key: string]: History} = {};
   for (let item of items) {
     let url = new URL(item.url as string);
     let pathname = url.origin + url.pathname;
@@ -52,8 +52,8 @@ const filterByPathname = (items: Item[], min: number): Item[] => {
   return filtered;
 };
 
-const filterByOrigin = (items: Item[], min: number): Item[] => {
-  let hash: {[key: string]: Item} = {};
+const filterByOrigin = (items: History[], min: number): History[] => {
+  let hash: {[key: string]: History} = {};
   for (let item of items) {
     let origin = new URL(item.url as string).origin;
     if (!hash[origin]) {

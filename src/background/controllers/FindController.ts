@@ -11,7 +11,7 @@ export default class FindController {
     return this.findUseCase.getKeyword();
   }
 
-  setKeyword(keyword: string): Promise<any> {
+  setKeyword(keyword: string): Promise<void> {
     return this.findUseCase.setKeyword(keyword);
   }
 }

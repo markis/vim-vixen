@@ -2,7 +2,15 @@ import MemoryStorage from '../infrastructures/MemoryStorage';
 
 const FIND_KEYWORD_KEY = 'find-keyword';
 
-export default class FindRepository {
+export default interface FindRepository {
+  getKeyword(): Promise<string>;
+
+  setKeyword(keyword: string): Promise<void>;
+
+  // eslint-disable-next-line semi
+}
+
+export class FindRepositoryImpl implements FindRepository {
   private cache: MemoryStorage;
 
   constructor() {
@@ -13,7 +21,7 @@ export default class FindRepository {
     return Promise.resolve(this.cache.get(FIND_KEYWORD_KEY));
   }
 
-  setKeyword(keyword: string): Promise<any> {
+  setKeyword(keyword: string): Promise<void> {
     this.cache.set(FIND_KEYWORD_KEY, keyword);
     return Promise.resolve();
   }

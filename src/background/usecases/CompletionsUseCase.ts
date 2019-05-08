@@ -1,14 +1,16 @@
+import Tab from '../domains/Tab';
 import CompletionGroup from '../domains/CompletionGroup';
 import CommandDocs from '../domains/CommandDocs';
-import CompletionsRepository from '../repositories/CompletionsRepository';
+import CompletionsRepository, { CompletionsRepositoryImpl }
+  from '../repositories/CompletionsRepository';
 import * as filters from './filters';
-import SettingRepository from '../repositories/SettingRepository';
+import SettingRepository, { SettingRepositoryImpl }
+  from '../repositories/SettingRepository';
 import TabPresenter from '../presenters/TabPresenter';
 import * as PropertyDefs from '../../shared/property-defs';
 
 const COMPLETION_ITEM_LIMIT = 10;
 
-type Tab = browser.tabs.Tab;
 type HistoryItem = browser.history.HistoryItem;
 
 export default class CompletionsUseCase {
@@ -18,10 +20,14 @@ export default class CompletionsUseCase {
 
   private settingRepository: SettingRepository;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
-    this.completionsRepository = new CompletionsRepository();
-    this.settingRepository = new SettingRepository();
+  constructor({
+    tabPresenter = new TabPresenter(),
+    completionsRepository = new CompletionsRepositoryImpl(),
+    settingRepository = new SettingRepositoryImpl(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
+    this.completionsRepository = completionsRepository;
+    this.settingRepository = settingRepository;
   }
 
   queryConsoleCommand(prefix: string): Promise<CompletionGroup[]> {

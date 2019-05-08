@@ -6,9 +6,12 @@ export default class VersionUseCase {
 
   private notifyPresenter: NotifyPresenter;
 
-  constructor() {
-    this.tabPresenter = new TabPresenter();
-    this.notifyPresenter = new NotifyPresenter();
+  constructor({
+    tabPresenter = new TabPresenter(),
+    notifyPresenter = new NotifyPresenter(),
+  } = {}) {
+    this.tabPresenter = tabPresenter;
+    this.notifyPresenter = notifyPresenter;
   }
 
   notify(): Promise<void> {

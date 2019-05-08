@@ -4,7 +4,15 @@ import * as PropertyDefs from '../../shared/property-defs';
 
 const CACHED_SETTING_KEY = 'setting';
 
-export default class SettingRepository {
+export default interface SettingRepository {
+  get(): Promise<Settings>;
+  update(value: Settings): Promise<void>;
+  setProperty(name: string, value: string | number | boolean): Promise<void>;
+
+  // eslint-disable-next-line semi
+}
+
+export class SettingRepositoryImpl implements SettingRepository {
   private cache: MemoryStorage;
 
   constructor() {
@@ -12,11 +20,12 @@ export default class SettingRepository {
   }
 
   get(): Promise<Settings> {
-    return Promise.resolve(this.cache.get(CACHED_SETTING_KEY));
+    return this.cache.get(CACHED_SETTING_KEY);
   }
 
-  update(value: Settings): void {
-    return this.cache.set(CACHED_SETTING_KEY, value);
+  update(value: Settings): Promise<void> {
+    this.cache.set(CACHED_SETTING_KEY, value);
+    return Promise.resolve();
   }
 
   async setProperty(

@@ -1,28 +1,30 @@
 import MemoryStorage from '../infrastructures/MemoryStorage';
+import Tab from '../domains/Tab';
 
 const CURRENT_SELECTED_KEY = 'tabs.current.selected';
 const LAST_SELECTED_KEY = 'tabs.last.selected';
 
-type Tab = browser.tabs.Tab;
-
 export default class TabPresenter {
-  open(url: string, tabId?: number): Promise<Tab> {
-    return browser.tabs.update(tabId, { url });
+  async open(url: string, tabId?: number): Promise<Tab> {
+    let tab = await browser.tabs.update(tabId, { url });
+    return { ...tab, id: tab.id!! };
   }
 
-  create(url: string, opts?: object): Promise<Tab> {
-    return browser.tabs.create({ url, ...opts });
+  async create(url: string, opts?: object): Promise<Tab> {
+    let tab = await browser.tabs.create({ url, ...opts });
+    return { ...tab, id: tab.id!! };
   }
 
   async getCurrent(): Promise<Tab> {
     let tabs = await browser.tabs.query({
       active: true, currentWindow: true
     });
-    return tabs[0];
+    return { ...tabs[0], id: tabs[0].id!! };
   }
 
-  getAll(): Promise<Tab[]> {
-    return browser.tabs.query({ currentWindow: true });
+  async getAll(): Promise<Tab[]> {
+    let tabs = await browser.tabs.query({ currentWindow: true });
+    return tabs.map(tab => ({ ...tab, id: tab.id!! }));
   }
 
   async getLastSelectedId(): Promise<number | undefined> {
@@ -41,11 +43,11 @@ export default class TabPresenter {
         t.title && t.title.toLowerCase().includes(keyword.toLowerCase());
     }).filter((t) => {
       return !(excludePinned && t.pinned);
-    });
+    }).map(t => ({ ...t, id: t.id!! }));
   }
 
-  select(tabId: number): Promise<Tab> {
-    return browser.tabs.update(tabId, { active: true });
+  async select(tabId: number): Promise<void> {
+    await browser.tabs.update(tabId, { active: true });
   }
 
   remove(ids: number[]): Promise<void> {
@@ -73,12 +75,13 @@ export default class TabPresenter {
     return browser.tabs.reload(tabId, { bypassCache: cache });
   }
 
-  setPinned(tabId: number, pinned: boolean): Promise<Tab> {
-    return browser.tabs.update(tabId, { pinned });
+  async setPinned(tabId: number, pinned: boolean): Promise<void> {
+    await browser.tabs.update(tabId, { pinned });
   }
 
-  duplicate(id: number): Promise<Tab> {
-    return browser.tabs.duplicate(id);
+  async duplicate(id: number): Promise<Tab> {
+    let tab = await browser.tabs.duplicate(id);
+    return { ...tab, id: tab.id!! };
   }
 
   getZoom(tabId: number): Promise<number> {

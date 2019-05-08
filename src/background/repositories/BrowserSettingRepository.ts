@@ -16,7 +16,13 @@ declare namespace browser.browserSettings.homepageOverride {
   function get(param: object): Promise<BrowserSettings>;
 }
 
-export default class BrowserSettingRepository {
+export default interface BrowserSettingRepository {
+  getHomepageUrls(): Promise<string[]>;
+
+  // eslint-disable-next-line semi
+}
+
+export class BrowserSettingRepositoryImpl implements BrowserSettingRepository {
   async getHomepageUrls(): Promise<string[]> {
     let { value } = await browser.browserSettings.homepageOverride.get({});
     return value.split('|').map(urls.normalizeUrl);

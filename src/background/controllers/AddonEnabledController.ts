@@ -7,7 +7,7 @@ export default class AddonEnabledController {
     this.addonEnabledUseCase = new AddonEnabledUseCase();
   }
 
-  indicate(enabled: boolean): Promise<any> {
+  indicate(enabled: boolean): Promise<void> {
     return this.addonEnabledUseCase.indicate(enabled);
   }
 }
