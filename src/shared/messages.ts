@@ -35,12 +35,13 @@ export const ADDON_ENABLED_QUERY = 'addon.enabled.query';
 export const ADDON_ENABLED_RESPONSE = 'addon.enabled.response';
 export const ADDON_TOGGLE_ENABLED = 'addon.toggle.enabled';
 
-export const OPEN_URL = 'open.url';
+export const OPEN_TO_TAB = 'open.to.tab';
+export const OPEN_NEW_TAB = 'open.new.tab';
 
 export const SETTINGS_CHANGED = 'settings.changed';
 export const SETTINGS_QUERY = 'settings.query';
 
-export const CONSOLE_FRAME_MESSAGE = 'console.frame.message';
+export const FRAMES_MESSAGE = 'frames.message';
 
 interface BackgroundOperationMessage {
   type: typeof BACKGROUND_OPERATION;
@@ -182,10 +183,14 @@ interface AddonToggleEnabledMessage {
   type: typeof ADDON_TOGGLE_ENABLED;
 }
 
-interface OpenUrlMessage {
-  type: typeof OPEN_URL;
+interface OpenToTab {
+  type: typeof OPEN_TO_TAB;
   url: string;
-  newTab: boolean;
+}
+
+interface OpenNewTab {
+  type: typeof OPEN_NEW_TAB;
+  url: string;
   background: boolean;
 }
 
@@ -197,9 +202,9 @@ interface SettingsQueryMessage {
   type: typeof SETTINGS_QUERY;
 }
 
-interface ConsoleFrameMessageMessage {
-  type: typeof CONSOLE_FRAME_MESSAGE;
-  message: any;
+interface FramesMessageMessage {
+  type: typeof FRAMES_MESSAGE;
+  message: Message;
 }
 
 export type Message =
@@ -231,14 +236,16 @@ export type Message =
   AddonEnabledQueryMessage |
   AddonEnabledResponseMessage |
   AddonToggleEnabledMessage |
-  OpenUrlMessage |
+  OpenToTab |
+  OpenNewTab |
   SettingsChangedMessage |
   SettingsQueryMessage |
-  ConsoleFrameMessageMessage;
+  FramesMessageMessage;
 
 // eslint-disable-next-line complexity
 export const valueOf = (o: any): Message => {
   switch (o.type) {
+  case BACKGROUND_OPERATION:
   case CONSOLE_UNFOCUS:
   case CONSOLE_ENTER_COMMAND:
   case CONSOLE_ENTER_FIND:
@@ -266,11 +273,12 @@ export const valueOf = (o: any): Message => {
   case ADDON_ENABLED_QUERY:
   case ADDON_ENABLED_RESPONSE:
   case ADDON_TOGGLE_ENABLED:
-  case OPEN_URL:
+  case OPEN_TO_TAB:
+  case OPEN_NEW_TAB:
   case SETTINGS_CHANGED:
   case SETTINGS_QUERY:
-  case CONSOLE_FRAME_MESSAGE:
+  case FRAMES_MESSAGE:
     return o;
   }
-  throw new Error('unknown operation type: ' + o.type);
+  throw new Error('unknown message type: ' + o.type);
 };

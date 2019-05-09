@@ -20,7 +20,7 @@ export class SettingRepositoryImpl implements SettingRepository {
   }
 
   get(): Promise<Settings> {
-    return this.cache.get(CACHED_SETTING_KEY);
+    return Promise.resolve(this.cache.get(CACHED_SETTING_KEY) as any);
   }
 
   update(value: Settings): Promise<void> {

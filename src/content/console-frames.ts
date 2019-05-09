@@ -17,7 +17,7 @@ const blur = (doc: Document) => {
 
 const postError = (text: string): Promise<any> => {
   return browser.runtime.sendMessage({
-    type: messages.CONSOLE_FRAME_MESSAGE,
+    type: messages.FRAMES_MESSAGE,
     message: {
       type: messages.CONSOLE_SHOW_ERROR,
       text,
@@ -27,7 +27,7 @@ const postError = (text: string): Promise<any> => {
 
 const postInfo = (text: string): Promise<any> => {
   return browser.runtime.sendMessage({
-    type: messages.CONSOLE_FRAME_MESSAGE,
+    type: messages.FRAMES_MESSAGE,
     message: {
       type: messages.CONSOLE_SHOW_INFO,
       text,

@@ -28,11 +28,18 @@ const paste = (win: Window, newTab: boolean, search: Search) => {
   if (win.document.execCommand('paste')) {
     let value = textarea.textContent as string;
     let url = urls.searchUrl(value, search);
-    browser.runtime.sendMessage({
-      type: messages.OPEN_URL,
-      url,
-      newTab,
-    });
+    if (newTab) {
+      browser.runtime.sendMessage({
+        type: messages.OPEN_NEW_TAB,
+        url,
+        newTab,
+      });
+    } else {
+      browser.runtime.sendMessage({
+        type: messages.OPEN_TO_TAB,
+        url,
+      });
+    }
   }
 
   textarea.remove();

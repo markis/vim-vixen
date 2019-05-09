@@ -1,4 +1,4 @@
-import ContentMessageListener from './infrastructures/ContentMessageListener';
+import { registerControllers } from './router';
 import SettingController from './controllers/SettingController';
 import VersionController from './controllers/VersionController';
 
@@ -12,7 +12,7 @@ browser.runtime.onInstalled.addListener((details) => {
   new VersionController().notify();
 });
 
-new ContentMessageListener().run();
+registerControllers();
 browser.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') {
     return;

@@ -108,11 +108,17 @@ export default class Follow {
     if (!href || href === '#' || href.toLowerCase().startsWith('javascript:')) {
       return;
     }
+    if (this.newTab) {
+      return browser.runtime.sendMessage({
+        type: messages.OPEN_NEW_TAB,
+        url: element.href,
+        newTab: true,
+        background: this.background,
+      });
+    }
     return browser.runtime.sendMessage({
-      type: messages.OPEN_URL,
+      type: messages.OPEN_TO_TAB,
       url: element.href,
-      newTab: true,
-      background: this.background,
     });
   }
 
